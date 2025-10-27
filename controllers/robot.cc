@@ -7,6 +7,18 @@
 
 static std::string workspacePath = "/home/default/";
 
+void api::v1::Robot::info(
+    const drogon::HttpRequestPtr& req,
+    std::function<void(const drogon::HttpResponsePtr&)>&& callback) {
+  Json::Value ret;
+  ret["deviceSerial"] = "TMP0123";
+  ret["result"] = 0;
+  ret["result_msg"] = "";
+
+  auto resp = drogon::HttpResponse::newHttpJsonResponse(ret);
+  callback(resp);
+}
+
 void api::v1::Robot::running(
     const drogon::HttpRequestPtr& req,
     std::function<void(const drogon::HttpResponsePtr&)>&& callback) {
