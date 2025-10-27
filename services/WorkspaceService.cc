@@ -122,6 +122,29 @@ services::WorkspaceOperationResult services::WorkspaceService::importWorkspace(
     archive_write_close(ext);
     archive_write_free(ext);
 
+    // Check if extraction created a single top-level directory
+    std::vector<std::string> topLevelItems;
+    for (const auto& entry :
+         std::filesystem::directory_iterator(workspaceName)) {
+      topLevelItems.push_back(entry.path().string());
+    }
+
+    // If there's only one top-level directory, rename it to 'workspace'
+    if (topLevelItems.size() == 1 &&
+        std::filesystem::is_directory(topLevelItems[0])) {
+      std::string extractedDirName =
+          std::filesystem::path(topLevelItems[0]).filename().string();
+
+      if (extractedDirName != "workspace") {
+        std::string oldPath = topLevelItems[0];
+        std::string newPath = workspaceName + "/workspace";
+
+        LOG_INFO << "Renaming directory '" << extractedDirName
+                 << "' to 'workspace'";
+        std::filesystem::rename(oldPath, newPath);
+      }
+    }
+
     result.success = true;
     result.data["workspaceName"] = workspaceName;
     result.data["extractedFiles"] = extractedFiles;
