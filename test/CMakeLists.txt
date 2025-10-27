@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(robot-controller-mock-server/_test CXX)
+project(robot-controller-mock-server_test CXX)
 
 add_executable(${PROJECT_NAME} test_main.cc)
 

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(robot-controller-mock-server/ CXX)
+project(robot-controller-mock-server CXX)
 
 include(CheckIncludeFileCXX)
 
