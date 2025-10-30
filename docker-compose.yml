@@ -7,11 +7,10 @@ services:
       - "8888:80"
   npm:
     image: jc21/nginx-proxy-manager:latest
-    container_name: npm_alt
     ports:
       - "80:80"
       - "443:443"
-      - "9900:81"
+      - '81:81' 
     volumes:
       - ./data_alt:/data
       - ./letsencrypt_alt:/etc/letsencrypt
