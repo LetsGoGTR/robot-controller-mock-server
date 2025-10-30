@@ -9,9 +9,9 @@ services:
     image: jc21/nginx-proxy-manager:latest
     container_name: npm_alt
     ports:
-      - "80:80"     # HTTP 포트 매핑
-      - "443:443"   # HTTPS 포트 매핑
-      - "5555:81"
+      - "80:80"
+      - "443:443"
+      - "9900:81"
     volumes:
       - ./data_alt:/data
       - ./letsencrypt_alt:/etc/letsencrypt
