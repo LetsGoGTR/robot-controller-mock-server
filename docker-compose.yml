@@ -5,3 +5,12 @@ services:
     build: .
     ports:
       - "8888:80"
+  npm:
+    image: jc21/nginx-proxy-manager:latest
+    container_name: npm_alt
+    ports:
+      - "80:80"     # HTTP 포트 매핑
+      - "443:443"   # HTTPS 포트 매핑
+    volumes:
+      - ./data_alt:/data
+      - ./letsencrypt_alt:/etc/letsencrypt
