@@ -3,14 +3,3 @@ version: "3.8"
 services:
   drogon-app:
     build: .
-    ports:
-      - "8888:80"
-  npm:
-    image: jc21/nginx-proxy-manager:latest
-    ports:
-      - "80:80"
-      - "443:443"
-      - '11111:81' 
-    volumes:
-      - ./data_alt:/data
-      - /etc/letsencrypt:/etc/letsencrypt
