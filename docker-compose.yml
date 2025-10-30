@@ -13,4 +13,3 @@ services:
       - '11111:81' 
     volumes:
       - ./data_alt:/data
-      - ./letsencrypt_alt:/etc/letsencrypt
