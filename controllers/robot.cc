@@ -23,7 +23,7 @@ void api::v1::Robot::running(
     const drogon::HttpRequestPtr& req,
     std::function<void(const drogon::HttpResponsePtr&)>&& callback) {
   Json::Value ret;
-  ret["data"] = false;
+  ret["data"] = true;
   ret["result"] = 0;
   ret["result_msg"] = "";
 
