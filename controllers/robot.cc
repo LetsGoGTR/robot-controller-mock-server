@@ -2,6 +2,7 @@
 
 #include <filesystem>
 #include <fstream>
+#include <random>
 
 #include "../services/WorkspaceService.h"
 
@@ -23,7 +24,12 @@ void api::v1::Robot::running(
     const drogon::HttpRequestPtr& req,
     std::function<void(const drogon::HttpResponsePtr&)>&& callback) {
   Json::Value ret;
-  ret["data"] = true;
+
+  static std::random_device rd;
+  static std::mt19937 gen(rd());
+  std::bernoulli_distribution d(0.5);
+
+  ret["data"] = d(gen);
   ret["result"] = 0;
   ret["result_msg"] = "";
 
