@@ -3,6 +3,8 @@ version: "3.8"
 services:
   drogon-app:
     build: .
+    volumes:
+      - /home/default:/home/default
     ports:
       - "8888:80"
 
@@ -11,5 +13,5 @@ services:
     ports:
       - "8890:22"
     volumes:
-      - /home/default/workspace:/home/default/workspace
+      - /home/default:/home/default
     command: default:default123:::workspace
