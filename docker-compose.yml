@@ -9,7 +9,7 @@ services:
   sftp-server:
     image: atmoz/sftp
     ports:
-      - "2222:22"
+      - "8890:22"
     volumes:
       - /home/default/workspace:/home/default/workspace
     command: default:default123:::workspace
