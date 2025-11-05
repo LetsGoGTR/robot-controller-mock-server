@@ -8,7 +8,7 @@
 
 static std::string workspacePath = "/home/default/";
 
-void api::v1::Robot::info(
+void api::Robot::info(
     const drogon::HttpRequestPtr& req,
     std::function<void(const drogon::HttpResponsePtr&)>&& callback) {
   Json::Value ret;
@@ -20,7 +20,7 @@ void api::v1::Robot::info(
   callback(resp);
 }
 
-void api::v1::Robot::running(
+void api::Robot::running(
     const drogon::HttpRequestPtr& req,
     std::function<void(const drogon::HttpResponsePtr&)>&& callback) {
   Json::Value ret;
@@ -37,7 +37,7 @@ void api::v1::Robot::running(
   callback(resp);
 }
 
-void api::v1::Robot::workspaceImport(
+void api::Robot::workspaceImport(
     const drogon::HttpRequestPtr& req,
     std::function<void(const drogon::HttpResponsePtr&)>&& callback) {
   drogon::MultiPartParser fileUpload;
@@ -156,7 +156,7 @@ void api::v1::Robot::workspaceImport(
   }
 }
 
-void api::v1::Robot::workspaceExport(
+void api::Robot::workspaceExport(
     const drogon::HttpRequestPtr& req,
     std::function<void(const drogon::HttpResponsePtr&)>&& callback) {
   // Check if workspace exists

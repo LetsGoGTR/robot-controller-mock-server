@@ -3,7 +3,6 @@
 #include <drogon/HttpController.h>
 
 namespace api {
-namespace v1 {
 class Robot : public drogon::HttpController<Robot> {
  public:
   METHOD_LIST_BEGIN
@@ -25,5 +24,4 @@ class Robot : public drogon::HttpController<Robot> {
       const drogon::HttpRequestPtr& req,
       std::function<void(const drogon::HttpResponsePtr&)>&& callback);
 };
-}  // namespace v1
 }  // namespace api
