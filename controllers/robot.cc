@@ -237,3 +237,10 @@ void api::Robot::workspaceExport(
     callback(resp);
   }
 }
+
+void api::Robot::workspaceArchive(
+    const drogon::HttpRequestPtr& req,
+    std::function<void(const drogon::HttpResponsePtr&)>&& callback) {}
+void api::Robot::workspaceExtract(
+    const drogon::HttpRequestPtr& req,
+    std::function<void(const drogon::HttpResponsePtr&)>&& callback) {}

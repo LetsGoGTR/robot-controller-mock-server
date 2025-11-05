@@ -11,6 +11,8 @@ class Robot : public drogon::HttpController<Robot> {
   METHOD_ADD(Robot::running, "/running", drogon::Get);
   METHOD_ADD(Robot::workspaceExport, "/export", drogon::Get);
   METHOD_ADD(Robot::workspaceImport, "/import", drogon::Post);
+  METHOD_ADD(Robot::workspaceArchive, "/archive", drogon::Get);
+  METHOD_ADD(Robot::workspaceExtract, "/extract", drogon::Get);
   METHOD_LIST_END
   // your declaration of processing function maybe like this:
   void info(const drogon::HttpRequestPtr& req,
@@ -21,6 +23,12 @@ class Robot : public drogon::HttpController<Robot> {
       const drogon::HttpRequestPtr& req,
       std::function<void(const drogon::HttpResponsePtr&)>&& callback);
   void workspaceImport(
+      const drogon::HttpRequestPtr& req,
+      std::function<void(const drogon::HttpResponsePtr&)>&& callback);
+  void workspaceArchive(
+      const drogon::HttpRequestPtr& req,
+      std::function<void(const drogon::HttpResponsePtr&)>&& callback);
+  void workspaceExtract(
       const drogon::HttpRequestPtr& req,
       std::function<void(const drogon::HttpResponsePtr&)>&& callback);
 };
