@@ -8,10 +8,19 @@ services:
     ports:
       - "8888:80"
 
-  sftp-server:
-    image: atmoz/sftp
-    ports:
-      - "8890:22"
+
+  ssh-server:
+    image: lscr.io/linuxserver/openssh-server:latest
+    container_name: ssh-server
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Asia/Seoul
+      - PASSWORD_ACCESS=true
+      - USER_NAME=default
+      - USER_PASSWORD=default123
     volumes:
       - /home/default:/home/default
-    command: default:default123:::workspace
+    ports:
+      - "8890:2222"
+    restart: unless-stopped
