@@ -3,8 +3,6 @@ version: "3.8"
 services:
   drogon-app:
     build: .
-    volumes:
-      - /home/default:/home/default
     ports:
       - "8888:80"
 
