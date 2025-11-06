@@ -12,6 +12,17 @@
 #include <sstream>
 #include <string>
 
+namespace Config {
+constexpr int PORT = 80;
+constexpr int LISTEN_BACKLOG = 10;
+constexpr size_t REQUEST_BUFFER_SIZE = 65536;
+constexpr size_t FILE_BUFFER_SIZE = 8192;
+constexpr size_t ARCHIVE_BLOCK_SIZE = 10240;
+constexpr const char* PATH_HOME_BASE = "/home/";
+constexpr const char* PATH_WORKSPACE = "/workspace";
+constexpr const char* PATH_ARCHIVE = "/workspace.tgz";
+}  // namespace Config
+
 namespace fs = std::filesystem;
 
 std::string extractJson(const std::string& json, const std::string& key) {
@@ -79,7 +90,7 @@ void addDirToArchive(archive* a, const std::string& path,
 
       if (S_ISREG(st.st_mode)) {
         std::ifstream file(full, std::ios::binary);
-        char buf[8192];
+        char buf[Config::FILE_BUFFER_SIZE];
         while (file.read(buf, sizeof(buf)) || file.gcount() > 0) {
           archive_write_data(a, buf, file.gcount());
         }
@@ -98,10 +109,10 @@ void addDirToArchive(archive* a, const std::string& path,
 }
 
 void compress(const std::string& user) {
-  std::string workspace = "/home/" + user + "/workspace";
-  std::string output = "/home/" + user + "/tmp/workspace.tgz";
+  std::string base = Config::PATH_HOME_BASE + user;
+  std::string workspace = base + Config::PATH_WORKSPACE;
+  std::string output = base + Config::PATH_ARCHIVE;
 
-  fs::create_directories("/home/" + user + "/tmp");
   fs::remove(output);
 
   archive* a = archive_write_new();
@@ -125,8 +136,9 @@ void compress(const std::string& user) {
 }
 
 void extract(const std::string& user) {
-  std::string workspace = "/home/" + user + "/workspace";
-  std::string input = "/home/" + user + "/tmp/workspace.tgz";
+  std::string base = Config::PATH_HOME_BASE + user;
+  std::string workspace = base + Config::PATH_WORKSPACE;
+  std::string input = base + Config::PATH_ARCHIVE;
 
   fs::remove_all(workspace);
 
@@ -138,13 +150,14 @@ void extract(const std::string& user) {
   try {
     archive_read_support_filter_all(a);
     archive_read_support_format_all(a);
-    if (archive_read_open_filename(a, input.c_str(), 10240) != ARCHIVE_OK) {
+    if (archive_read_open_filename(a, input.c_str(),
+                                   Config::ARCHIVE_BLOCK_SIZE) != ARCHIVE_OK) {
       throw std::runtime_error("Failed to open archive");
     }
 
     archive_entry* entry;
     while (archive_read_next_header(a, &entry) == ARCHIVE_OK) {
-      std::string path = "/home/" + user + "/" + archive_entry_pathname(entry);
+      std::string path = base + "/" + archive_entry_pathname(entry);
       archive_entry_set_pathname(entry, path.c_str());
 
       archive* ext = archive_write_disk_new();
@@ -163,17 +176,24 @@ void extract(const std::string& user) {
     }
     archive_read_close(a);
     archive_read_free(a);
+
+    fs::remove(input);
   } catch (...) {
     archive_read_free(a);
     throw;
   }
 }
 
-void handleRequest(int client) {
-  char buf[65536] = {0};
-  if (read(client, buf, sizeof(buf) - 1) <= 0) {
-    return;
+std::string jsonMsg(bool ok, const std::string& msg) {
+  if (ok) {
+    return R"({"success":true,"message":")" + msg + R"("})";
   }
+  return R"({"success":false,"message":")" + msg + R"("})";
+}
+
+void handleRequest(int client) {
+  char buf[Config::REQUEST_BUFFER_SIZE] = {0};
+  if (read(client, buf, sizeof(buf) - 1) <= 0) return;
 
   try {
     std::string req(buf);
@@ -186,8 +206,7 @@ void handleRequest(int client) {
     std::cout << method << " " << path << '\n';
 
     if (method != "POST") {
-      sendResponse(client, 404, R"({"success":false,"message":"Not found"})");
-
+      sendResponse(client, 404, jsonMsg(false, "Not found"));
       return;
     }
 
@@ -198,20 +217,30 @@ void handleRequest(int client) {
     std::getline(stream, body, '\0');
 
     std::string user = extractJson(body, "user");
+
     if (user.empty()) {
-      sendResponse(client, 400,
-                   R"({"success":false,"message":"Missing user"})");
+      sendResponse(client, 400, jsonMsg(false, "Missing user"));
+    }
+
+    if (user.find("..") != std::string::npos ||
+        user.find("/") != std::string::npos) {
+      sendResponse(client, 400, jsonMsg(false, "Invalid user"));
+      return;
+    }
+
+    if (!fs::exists(Config::PATH_HOME_BASE + user)) {
+      sendResponse(client, 404, jsonMsg(false, "User not found"));
       return;
     }
 
     if (path == "/compress") {
       compress(user);
-      sendResponse(client, 200, R"({"success":true,"message":"Compressed"})");
+      sendResponse(client, 200, jsonMsg(true, "Compressed"));
     } else if (path == "/extract") {
       extract(user);
-      sendResponse(client, 200, R"({"success":true,"message":"Extracted"})");
+      sendResponse(client, 200, jsonMsg(true, "Extracted"));
     } else {
-      sendResponse(client, 404, R"({"success":false,"message":"Not found"})");
+      sendResponse(client, 404, jsonMsg(false, "Not found"));
     }
   } catch (const std::exception& e) {
     sendResponse(client, 500,
@@ -233,16 +262,16 @@ int main() {
     sockaddr_in addr = {};
     addr.sin_family = AF_INET;
     addr.sin_addr.s_addr = INADDR_ANY;
-    addr.sin_port = htons(80);
+    addr.sin_port = htons(Config::PORT);
 
     if (bind(server, (sockaddr*)&addr, sizeof(addr)) < 0) {
       throw std::runtime_error("Bind failed");
     }
-    if (listen(server, 10) < 0) {
+    if (listen(server, Config::LISTEN_BACKLOG) < 0) {
       throw std::runtime_error("Listen failed");
     }
 
-    std::cout << "Server started on port 80\n";
+    std::cout << "Server started on port " << Config::PORT << '\n';
 
     while (true) {
       try {
