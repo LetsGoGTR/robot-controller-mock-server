@@ -13,6 +13,8 @@
 
 namespace fs = std::filesystem;
 
+namespace services {
+
 static void addDirToArchive(archive* a, const std::string& path,
                             const std::string& prefix) {
   DIR* dir = opendir(path.c_str());
@@ -60,7 +62,7 @@ static void addDirToArchive(archive* a, const std::string& path,
   }
 }
 
-void compress(const std::string& user) {
+void WorkspaceService::compress(const std::string& user) {
   std::string base = Config::PATH_HOME_BASE + user;
   std::string workspace = base + Config::PATH_WORKSPACE;
   std::string output = base + Config::PATH_ARCHIVE;
@@ -91,7 +93,7 @@ void compress(const std::string& user) {
   }
 }
 
-void extract(const std::string& user) {
+void WorkspaceService::extract(const std::string& user) {
   std::string base = Config::PATH_HOME_BASE + user;
   std::string workspace = base + Config::PATH_WORKSPACE;
   std::string input = base + Config::PATH_ARCHIVE;
@@ -143,3 +145,5 @@ void extract(const std::string& user) {
     throw;
   }
 }
+
+}  // namespace services

@@ -32,6 +32,8 @@ int main() {
 
     std::cout << "Server started on port " << Config::PORT << '\n';
 
+    controllers::HttpController httpController;
+
     while (true) {
       try {
         sockaddr_in client_addr;
@@ -41,7 +43,7 @@ int main() {
           continue;
         }
 
-        handleRequest(client);
+        httpController.handleRequest(client);
         close(client);
       } catch (const std::exception& e) {
         std::cerr << "Error: " << e.what() << '\n';

@@ -1,5 +1,7 @@
 #include "utils.h"
 
+namespace utils {
+
 std::string extractJson(const std::string& json, const std::string& key) {
   size_t pos = json.find("\"" + key + "\"");
   if (pos == std::string::npos) {
@@ -20,3 +22,5 @@ std::string jsonMsg(bool ok, const std::string& msg) {
   }
   return R"({"success":false,"message":")" + msg + R"("})";
 }
+
+}  // namespace utils
