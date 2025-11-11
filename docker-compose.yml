@@ -12,5 +12,5 @@ services:
     ports:
       - "8890:22"
     volumes:
-      - /home/default/workspace:/home/default/workspace
+      - /home/default:/home/default
     command: default:default123:1000:1000:::workspace
